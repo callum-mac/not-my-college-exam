@@ -63,30 +63,48 @@
         exit();
     }
 
+
+    //Hashing password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insertion Query
-    $query = "INSERT INTO `Users` (Name, Email, DOB, Username, Password, Location, Allergies) VALUES(:fullname, :email, :dob, :username, :password, :location, :allergies)";
+
+    $query = "SELECT * FROM `Users` WHERE `Username` = :username AND 'Email' == :email";
     $stmt = $conn->prepare($query);
-    $stmt->bindParam(':fullname', $fullname);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':dob', $dob);
     $stmt->bindParam(':username', $username); 
-    $stmt->bindParam(':password', $hashed_password);
-    $stmt->bindParam(':location', $location);
-    $stmt->bindParam(':allergies', $allergies);
+    $stmt->bindParam(':email', $email);
+    $stmt->execute();
+    $row = $stmt->fetch();
+    if ($username==($row['Username'])){
+        $_SESSION['error'] = "Username already taken! Please Try Again!";
+        header('location:registerpage.php');
+        exit();
+    } else if ($email==($row['Email'])){
+            $_SESSION['error'] = "An Account is already linked with that Email! Please Try Again!";
+        header('location:registerpage.php');
+        exit();
+    } else {
+        // Insertion Query
+        $query = "INSERT INTO `Users` (Name, Email, DOB, Username, Password, Location, Allergies) VALUES(:fullname, :email, :dob, :username, :password, :location, :allergies)";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':fullname', $fullname);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':dob', $dob);
+        $stmt->bindParam(':username', $username); 
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':location', $location);
+        $stmt->bindParam(':allergies', $allergies);
 
 
-    
-    // Check if the execution of query is success
-    if($stmt->execute()){
-        //setting a 'success' session to save our insertion success message.
-        $_SESSION['success'] = "Account Created!";
+        
+        // Check if the execution of query is success
+        if($stmt->execute()){
+            //setting a 'success' session to save our insertion success message.
+            $_SESSION['success'] = "Account Created!";
 
-        //redirecting to the index.php 
-        header('location: registerpage.php');
+            //redirecting to the index.php 
+            header('location: registerpage.php');
+        }
     }
-    
 
 
 
