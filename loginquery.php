@@ -11,17 +11,24 @@
 
 
     // Select Query for counting the row that has the same value of the given username and password. This query is for checking if the access is valid or not.
-    $query = "SELECT * FROM `Users` WHERE `Username` = :username AND `Password` = :password";
+    $query = "SELECT * FROM `Users` WHERE `Username` = :username";
+
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':username', $username);
-    $stmt->bindParam(':password', $password);
+    // $stmt->bindParam(':password', $password);
     $stmt->execute();
     $row = $stmt->fetch();
 
     $count = count($row ? $row : []);
     if ($count > 0) {
-        $_SESSION["user"] = $row;
-        header('location:MyHealthPostLogin.php');
+
+        if (password_verify($password, $row[5])) {
+            $_SESSION["user"] = $row;
+            header('location:MyHealthPostLogin.php');
+        } else {
+            $_SESSION['error'] = "Invalid username or password";
+            header('location:loginpage.php');
+        }
     }else{
         $_SESSION['error'] = "Invalid username or password";
         header('location:loginpage.php');

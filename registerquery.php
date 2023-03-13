@@ -90,7 +90,7 @@
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':dob', $dob);
         $stmt->bindParam(':username', $username); 
-        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':password', $hashed_password);
         $stmt->bindParam(':location', $location);
         $stmt->bindParam(':allergies', $allergies);
 
